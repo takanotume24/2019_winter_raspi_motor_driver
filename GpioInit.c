@@ -32,6 +32,13 @@
 #define CMD_MOTOR_RIGHT_FOWARD 35
 #define CMD_MOTOR_RIGHT_BACK 36
 #define CMD_MOTOR_RIGHT_STOP 37
+#define CMD_HOUDAI_RIGHT 38
+#define CMD_HOUDAI_LEFT 39
+#define CMD_HOUDAI_STOP 40
+#define CMD_GUN_FIRE 41
+#define CMD_GUN_STOP 42
+#define CMD_MOTOR_LEFT_ENABLE 43
+#define CMD_MOTOR_RIGHT_ENABLE 44
 
 #define PIN_02 2
 #define PIN_MOVE_INA1 21
@@ -91,44 +98,55 @@ static int raspi_gpio_open(struct inode *inode, struct file *filp) {
 
 static long raspi_gpio_ioclt(struct file *file, unsigned int cmd,
                              unsigned long arg) {
-  if (arg != 0 && arg != 1) {
-    printk(KERN_DEBUG "bad arg. 0 or 1\n");
-    return -1;
-  }
-
   switch (cmd) {
     case CMD_GPIO02_VALUE:
       digitalWriteLike(2, arg);
       break;
+
     case CMD_MOTOR_LEFT_BACK:
-      digitalWriteLike(PIN_MOVE_ENAA, HIGH);
       digitalWriteLike(PIN_MOVE_INA1, LOW);
       digitalWriteLike(PIN_MOVE_INA2, HIGH);
       break;
+
     case CMD_MOTOR_LEFT_FOWARD:
-      digitalWriteLike(PIN_MOVE_ENAA, HIGH);
       digitalWriteLike(PIN_MOVE_INA1, HIGH);
       digitalWriteLike(PIN_MOVE_INA2, LOW);
       break;
+
     case CMD_MOTOR_LEFT_STOP:
-      digitalWriteLike(PIN_MOVE_ENAA, LOW);
       digitalWriteLike(PIN_MOVE_INA1, LOW);
       digitalWriteLike(PIN_MOVE_INA2, LOW);
       break;
+
     case CMD_MOTOR_RIGHT_BACK:
-      digitalWriteLike(PIN_MOVE_ENAB, HIGH);
       digitalWriteLike(PIN_MOVE_INB1, LOW);
       digitalWriteLike(PIN_MOVE_INB2, HIGH);
       break;
+
     case CMD_MOTOR_RIGHT_FOWARD:
-      digitalWriteLike(PIN_MOVE_ENAB, HIGH);
       digitalWriteLike(PIN_MOVE_INB1, HIGH);
       digitalWriteLike(PIN_MOVE_INB2, LOW);
       break;
+
     case CMD_MOTOR_RIGHT_STOP:
-      digitalWriteLike(PIN_MOVE_ENAB, LOW);
       digitalWriteLike(PIN_MOVE_INB1, LOW);
       digitalWriteLike(PIN_MOVE_INB2, LOW);
+      break;
+
+    case CMD_MOTOR_LEFT_ENABLE:
+      if (arg != 0 && arg != 1) {
+        printk(KERN_DEBUG "arg allowed only 1 or 0.\n");
+        return -1;
+      }
+      digitalWriteLike(PIN_MOVE_ENAA, arg);
+      break;
+
+    case CMD_MOTOR_RIGHT_ENABLE:
+      if (arg != 0 && arg != 1) {
+        printk(KERN_DEBUG "arg allowed only 1 or 0.\n");
+        return -1;
+      }
+      digitalWriteLike(PIN_MOVE_ENAB, arg);
       break;
   }
   return 0;
