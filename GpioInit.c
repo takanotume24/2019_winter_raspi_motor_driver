@@ -161,7 +161,7 @@ static long raspi_gpio_ioclt(struct file *file, unsigned int cmd,
 
     case CMD_HOUDAI_STOP:
       digitalWriteLike(PIN_HOUDAI_INA1, LOW);
-      digitalWriteLike(PIN_HOUDAI_INA1, LOW);
+      digitalWriteLike(PIN_HOUDAI_INA2, LOW);
       break;
 
     case CMD_GUN_FIRE:
