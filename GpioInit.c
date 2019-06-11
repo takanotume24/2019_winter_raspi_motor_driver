@@ -65,6 +65,11 @@ static int raspi_gpio_open(struct inode *inode, struct file *filp) {
 
 static long raspi_gpio_ioclt(struct file *file, unsigned int cmd,
                              unsigned long arg) {
+  if (arg != 0 && arg != 1) {
+    printk(KERN_DEBUG "bad arg. 0 or 1\n");
+    return -1;
+  }
+
   switch (cmd) {
     case GPIO02_VALUE:
       digitalWriteLike(2, arg);
