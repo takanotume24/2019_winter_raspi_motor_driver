@@ -25,6 +25,7 @@
 #define MAX_GPIO_NUMBER 1
 #define DEVICE_NAME "raspiGpio"
 #define BUF_SIZE 512
+#define GPIO02_VALUE 1
 
 struct raspi_gpio_dev {
   struct cdev cdev;
@@ -35,11 +36,13 @@ struct raspi_gpio_dev {
 
 /* Declaration of entry points */
 static int raspi_gpio_open(struct inode *inode, struct file *filp);
-
+static long raspi_gpio_ioclt(struct file *file, unsigned int cmd,
+                             unsigned long arg);
 /* File operation structure */
 static struct file_operations raspi_gpio_fops = {
     .owner = THIS_MODULE,
     .open = raspi_gpio_open,
+    .unlocked_ioctl = raspi_gpio_ioclt,
 };
 
 /* Forward declaration of functions */
@@ -57,6 +60,16 @@ static int raspi_gpio_open(struct inode *inode, struct file *filp) {
   raspi_gpio_devp = container_of(inode->i_cdev, struct raspi_gpio_dev, cdev);
   filp->private_data = raspi_gpio_devp;
 
+  return 0;
+}
+
+static long raspi_gpio_ioclt(struct file *file, unsigned int cmd,
+                             unsigned long arg) {
+  switch (cmd) {
+    case GPIO02_VALUE:
+      digitalWriteLike(2, arg);
+      break;
+  }
   return 0;
 }
 
@@ -120,7 +133,6 @@ static int __init raspi_gpio_init(void) {
 
   wiringPiSetupGpioLike();
   pinModeLike(2, OUTPUT);
-  digitalWriteLike(2, HIGH);
 
   return 0;
 }
