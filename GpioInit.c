@@ -148,6 +148,29 @@ static long raspi_gpio_ioclt(struct file *file, unsigned int cmd,
       }
       digitalWriteLike(PIN_MOVE_ENAB, arg);
       break;
+
+    case CMD_HOUDAI_LEFT:
+      digitalWriteLike(PIN_HOUDAI_INA1, HIGH);
+      digitalWriteLike(PIN_HOUDAI_INA2, LOW);
+      break;
+
+    case CMD_HOUDAI_RIGHT:
+      digitalWriteLike(PIN_HOUDAI_INA1, LOW);
+      digitalWriteLike(PIN_HOUDAI_INA2, HIGH);
+      break;
+
+    case CMD_HOUDAI_STOP:
+      digitalWriteLike(PIN_HOUDAI_INA1, LOW);
+      digitalWriteLike(PIN_HOUDAI_INA1, LOW);
+      break;
+
+    case CMD_GUN_FIRE:
+      digitalWriteLike(PIN_HOUDAI_INB1, HIGH);
+      break;
+
+    case CMD_GUN_STOP:
+      digitalWriteLike(PIN_HOUDAI_INB1, LOW);
+      break;
   }
   return 0;
 }
