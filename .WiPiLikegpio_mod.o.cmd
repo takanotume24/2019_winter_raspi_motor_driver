@@ -1,1 +1,1 @@
-cmd_/home/pi/samples_matsunaga/kadai_10/WiPiLikegpio_mod.o := ld -EL    -r -o /home/pi/samples_matsunaga/kadai_10/WiPiLikegpio_mod.o /home/pi/samples_matsunaga/kadai_10/GpioInit.o /home/pi/samples_matsunaga/kadai_10/WiPiLike.o 
+cmd_/home/pi/samples_matsunaga/kadai_11/WiPiLikegpio_mod.o := ld -EL    -r -o /home/pi/samples_matsunaga/kadai_11/WiPiLikegpio_mod.o /home/pi/samples_matsunaga/kadai_11/GpioInit.o /home/pi/samples_matsunaga/kadai_11/WiPiLike.o 

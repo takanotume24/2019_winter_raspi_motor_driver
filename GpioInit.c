@@ -25,7 +25,24 @@
 #define MAX_GPIO_NUMBER 1
 #define DEVICE_NAME "raspiGpio"
 #define BUF_SIZE 512
-#define GPIO02_VALUE 1
+#define CMD_GPIO02_VALUE 1
+#define CMD_MOTOR_LEFT_FOWARD 32
+#define CMD_MOTOR_LEFT_BACK 33
+#define CMD_MOTOR_LEFT_STOP 34
+#define CMD_MOTOR_RIGHT_FOWARD 35
+#define CMD_MOTOR_RIGHT_BACK 36
+#define CMD_MOTOR_RIGHT_STOP 37
+
+#define PIN_02 2
+#define PIN_MOVE_INA1 21
+#define PIN_MOVE_INA2 20
+#define PIN_MOVE_INB1 26
+#define PIN_MOVE_INB2 19
+#define PIN_MOVE_ENAA 5
+#define PIN_MOVE_ENAB 6
+#define PIN_HOUDAI_INA1 13
+#define PIN_HOUDAI_INA2 16
+#define PIN_HOUDAI_INB1 12
 
 struct raspi_gpio_dev {
   struct cdev cdev;
@@ -38,11 +55,14 @@ struct raspi_gpio_dev {
 static int raspi_gpio_open(struct inode *inode, struct file *filp);
 static long raspi_gpio_ioclt(struct file *file, unsigned int cmd,
                              unsigned long arg);
+static int raspi_gpio_close(struct inode *inode, struct file *filp);
+
 /* File operation structure */
 static struct file_operations raspi_gpio_fops = {
     .owner = THIS_MODULE,
     .open = raspi_gpio_open,
     .unlocked_ioctl = raspi_gpio_ioclt,
+    .release = raspi_gpio_close,
 };
 
 /* Forward declaration of functions */
@@ -53,12 +73,18 @@ struct raspi_gpio_dev *raspi_gpio_devp[NUM_GPIO_PINS];
 static dev_t first;
 static struct class *raspi_gpio_class;
 
+static int raspi_gpio_close(struct inode *inode, struct file *flip) {
+  return 0;
+  IoUeMapVals();
+}
+
 static int raspi_gpio_open(struct inode *inode, struct file *filp) {
   struct raspi_gpio_dev *raspi_gpio_devp;
 
   printk(KERN_INFO "GPIO opened\n");
   raspi_gpio_devp = container_of(inode->i_cdev, struct raspi_gpio_dev, cdev);
   filp->private_data = raspi_gpio_devp;
+  wiringPiSetupGpioLike();
 
   return 0;
 }
@@ -71,8 +97,38 @@ static long raspi_gpio_ioclt(struct file *file, unsigned int cmd,
   }
 
   switch (cmd) {
-    case GPIO02_VALUE:
+    case CMD_GPIO02_VALUE:
       digitalWriteLike(2, arg);
+      break;
+    case CMD_MOTOR_LEFT_BACK:
+      digitalWriteLike(PIN_MOVE_ENAA, HIGH);
+      digitalWriteLike(PIN_MOVE_INA1, LOW);
+      digitalWriteLike(PIN_MOVE_INA2, HIGH);
+      break;
+    case CMD_MOTOR_LEFT_FOWARD:
+      digitalWriteLike(PIN_MOVE_ENAA, HIGH);
+      digitalWriteLike(PIN_MOVE_INA1, HIGH);
+      digitalWriteLike(PIN_MOVE_INA2, LOW);
+      break;
+    case CMD_MOTOR_LEFT_STOP:
+      digitalWriteLike(PIN_MOVE_ENAA, LOW);
+      digitalWriteLike(PIN_MOVE_INA1, LOW);
+      digitalWriteLike(PIN_MOVE_INA2, LOW);
+      break;
+    case CMD_MOTOR_RIGHT_BACK:
+      digitalWriteLike(PIN_MOVE_ENAB, HIGH);
+      digitalWriteLike(PIN_MOVE_INB1, LOW);
+      digitalWriteLike(PIN_MOVE_INB2, HIGH);
+      break;
+    case CMD_MOTOR_RIGHT_FOWARD:
+      digitalWriteLike(PIN_MOVE_ENAB, HIGH);
+      digitalWriteLike(PIN_MOVE_INB1, HIGH);
+      digitalWriteLike(PIN_MOVE_INB2, LOW);
+      break;
+    case CMD_MOTOR_RIGHT_STOP:
+      digitalWriteLike(PIN_MOVE_ENAB, LOW);
+      digitalWriteLike(PIN_MOVE_INB1, LOW);
+      digitalWriteLike(PIN_MOVE_INB2, LOW);
       break;
   }
   return 0;
@@ -137,7 +193,16 @@ static int __init raspi_gpio_init(void) {
   }
 
   wiringPiSetupGpioLike();
-  pinModeLike(2, OUTPUT);
+  pinModeLike(PIN_02, OUTPUT);
+  pinModeLike(PIN_MOVE_INB2, OUTPUT);
+  pinModeLike(PIN_MOVE_INB1, OUTPUT);
+  pinModeLike(PIN_MOVE_INA2, OUTPUT);
+  pinModeLike(PIN_MOVE_INA1, OUTPUT);
+  pinModeLike(PIN_MOVE_ENAA, OUTPUT);
+  pinModeLike(PIN_MOVE_ENAB, OUTPUT);
+  pinModeLike(PIN_HOUDAI_INA1, OUTPUT);
+  pinModeLike(PIN_HOUDAI_INA2, OUTPUT);
+  pinModeLike(PIN_HOUDAI_INB1, OUTPUT);
 
   return 0;
 }
